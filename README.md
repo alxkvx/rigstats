@@ -1,6 +1,7 @@
 ## rig-stats
 This is simple php page that collects stats from miners and shows it on single page.
 
+![alt text](https://raw.githubusercontent.com/alxkvx/rig-stats/master/rigs.JPG)
 ## Requirements:
 - Linux or windows pc/laptop/server/VM on the same network with miners
 - running web server: apache/nginx etc.
@@ -33,7 +34,3 @@ $rigs = array (
 ```
 ## Access:
 http://<machine_IP>/rig-stats.php
-
-example:
-
-![alt text](https://raw.githubusercontent.com/alxkvx/rig-stats/master/rigs.JPG)
