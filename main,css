@@ -1,0 +1,34 @@
+body {
+	background-color: black;
+	color: white;
+}
+table {
+	font-size: 14px;
+}
+.hwred {
+	color: #ed5550;
+}
+.bold {
+	font-weight: bold;
+}
+.head {
+	font-weight: bold;
+	text-align: center;
+}
+.total {font-weight: bold;}
+.red { background-color: red; font-weight: bold;}
+.greenlight { background-color: #06e910; color: #1f0cd8; font-weight: bold;}
+.green { background-color: green;}
+.yellow { background-color: #ffff05; color: #000;}
+.orange { background-color: #d85f07;}
+.blue { background-color: #0a64c8;}
+.fiol { background-color: #8d029c;}
+.box {
+	position: relative;
+	display: inline-block;
+	padding-left: 5;
+	padding-right: 5;
+	padding-bottom: 1;
+	border-radius: 4px 4px 4px 4px;
+	margin-right: 5;
+}
