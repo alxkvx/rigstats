@@ -246,7 +246,10 @@ for($x = 0; $x < $rigsnum; $x++) {
 	$name = $rigs[$x][1];
 	$gpus = $rigs[$x][2];
 	
-	$socket = fsockopen($ip, 3333, $err_code, $err_str);
+	$socket = fsockopen($ip, 3333, $err_code, $err_str,1);
+	if (!$socket) {
+		continue;
+	}
 	$data = '{"id":1,"jsonrpc":"2.0","method":"miner_getstat2"}' . "\r\n\r\n";
 	fputs($socket, $data);
 	$buffer = null;
