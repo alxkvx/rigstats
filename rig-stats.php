@@ -238,7 +238,7 @@ for($x = 0; $x < $l3num; $x++) {
 
 $html .= "</table><br><span class=bold>Total: ". $l3num . " miners" . " / " . number_format($l3hashrate) . " Mh / ".number_format($l3hashavg). " Mh(Avg)</span><br><br>";
 
-$html .= "<table border=0 cellspacing=0 cellpadding=4><tr class=head><td>Type</td><td>IP</td><td>Pool</td><td>Uptime</td><td>ETH/XVG</td><td>Temp avg</td><td>GPU0</td><td>GPU1</td><td>GPU2</td><td>GPU3</td><td>GPU4</td><td>GPU5</td><td>GPU6</td><td>GPU7</td><td>GPU8</td><td>GPU9</td></tr>";
+$html .= "<table border=0 cellspacing=0 cellpadding=4><tr class=head><td>Name</td><td>IP</td><td>Pool</td><td>Uptime</td><td>ETH/XVG</td><td>Temp avg</td><td>GPU0</td><td>GPU1</td><td>GPU2</td><td>GPU3</td><td>GPU4</td><td>GPU5</td><td>GPU6</td><td>GPU7</td><td>GPU8</td><td>GPU9</td></tr>";
 
 for($x = 0; $x < $rigsnum; $x++) {
 	
@@ -248,6 +248,7 @@ for($x = 0; $x < $rigsnum; $x++) {
 	
 	$socket = fsockopen($ip, 3333, $err_code, $err_str,1);
 	if (!$socket) {
+		$html .= "<tr><td>$name</td><td><span class=\"red\">$ip</span></td><td><span class=\"box red\">Offline</span></td></tr>";
 		continue;
 	}
 	$data = '{"id":1,"jsonrpc":"2.0","method":"miner_getstat2"}' . "\r\n\r\n";
