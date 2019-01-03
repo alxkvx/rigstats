@@ -2,10 +2,11 @@
 This is simple php page that collects stats from miners and shows it on single page.
 
 ![alt text](https://raw.githubusercontent.com/alxkvx/rig-stats/master/rigs.JPG)
+![alt text](https://raw.githubusercontent.com/alxkvx/rig-stats/master/rig_extinfo.JPG)
 ## Requirements:
 - Linux or windows pc/laptop/server/VM on the same network with miners
 - running web server: apache/nginx etc.
-- php module
+- php with json module
 
 ## Installaion:
 download rig-stats.php and main.css files into web server doc root (f.e. /var/www/html)
@@ -27,8 +28,7 @@ $l3 = array(
 
 $rigs = array (
 	['10.10.11.62',<rig_name>,<cards_number>,<claymore_api_port>],
-	['10.10.11.63','rig01 8xRX570',8,3335],	
-	['10.10.11.65','rig02 8xRX570',8,3333]
+	['10.10.11.63','rig01 8xRX570',8,3335]
 );
 ```
 ## Access:
