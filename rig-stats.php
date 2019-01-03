@@ -1,61 +1,44 @@
 <?php
 
+error_reporting(E_ERROR | E_PARSE);
 $start = microtime(true);
 
 $s9 = array(
-	'10.10.11.38',
-	'10.10.11.41',
-	'10.10.11.42',
-	'10.10.11.43',
-	'10.10.11.44',
-	'10.10.11.46',
-	'10.10.11.47',
-	'10.10.11.50',
-	'10.10.11.51',
-	'10.10.11.52',
-	'10.10.11.53',
-	'10.10.11.54',
-	'10.10.11.55',
-	'10.10.11.56',
-	'10.10.11.58',
-	'10.10.11.59'
+	'10.10.11.34',
+	'10.10.11.35',
+	'10.10.11.36'
 );
-
+	
 $l3 = array(
-	'10.10.11.40',
-	'10.10.11.48'
+        '10.1.1.112',
+        '10.1.1.32'
 );
 
 $rigs = array (
-	['10.10.11.62','ESONIC02 8xRX570',8,3335],
-	['10.10.11.63','ASUS02 8xRX570',8,3335],
-	['10.10.11.64','BIOSTAR01 10xRX570',10,3335],
-	['10.10.11.65','ASUS01 8xRX570',8,3333]
+	['10.10.11.62','ESONIC02 8xRX570',8],
+	['10.10.11.63','ASUS02 8xRX570',8]
 );
 
-
-$rigsnum = count($rigs);
 $s9num = count($s9);
 $l3num = count($l3);
+$rigsnum = count($rigs);
 
 $totalhashrate = 0;
 $l3hashrate = 0;
-$ethtotal =0;
-$xvgtotal =0;
 
 function get_api($ip,$command) {
 	
-	$socket = fsockopen($ip, 4028, $err_code, $err_str, 2);
-	if (!$socket) { return 0;}
+	$socket = fsockopen($ip, 4028, $err_code, $err_str, 1);
+	if (!$socket) {
+		$socket2 = fsockopen($ip, 22, $err_code, $err_str, 1);
+			if ($socket2)	{return 1;}
+			else 		{return 0;}
+	}
 	$data = '{"id":1,"jsonrpc":"2.0","command": "'. $command . '"}' . "\r\n\r\n";
 	fputs($socket, $data);
 	$buffer = null;
-	while (!feof($socket)) {
-		$buffer .= fgets($socket, 4028);
-	}
-	if ($socket) {
-		fclose($socket);
-	}
+	while (!feof($socket)) { $buffer .= fgets($socket, 4028); }
+	if ($socket) {  fclose($socket); }
 	$buff = substr($buffer,0,strlen($buffer)-1);
 	$buff = preg_replace('/}{/','},{',$buff);
 	$buff = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $buff);
@@ -67,9 +50,12 @@ function get_api($ip,$command) {
 function miner_details($type,$ip) {
 	
 	$json = get_api($ip,'summary');
-	if ($json == 0) {
-		return array(0,'<tr><td><span class="box red">Offline</span></td><td></td><td><span class="red">'.$ip.'</span></td></tr>');
+	if ($json == 0)	{
+		return array(0,0,'<tr><td><span class="box red">Offline</span></td><td></td><td><span class="red">'.$ip.'</span></td></tr>');
 	}
+	else if ($json == 1) {
+		return array(0,0,'<tr><td><span class="box yellow">SSH Only</span></td><td></td><td><span class="red">'.$ip.'</span></td></tr>');
+        }
 	$getworks       = number_format($json['SUMMARY'][0]['Getworks']);
 	$elapsed        = $json['SUMMARY'][0]['Elapsed'];
 	$hw             = $json['SUMMARY'][0]['Hardware Errors'];
@@ -77,41 +63,29 @@ function miner_details($type,$ip) {
 	$rejected       = $json['SUMMARY'][0]['Rejected'];
 	$stale          = $json['SUMMARY'][0]['Stale'];
 	$discarded      = $json['SUMMARY'][0]['Discarded'];
-	$ghsav          = number_format(round($json['SUMMARY'][0]['GHS av']));
+	$ghsav          = $json['SUMMARY'][0]['GHS av'];
 	$ghs5s          = round($json['SUMMARY'][0]['GHS 5s']);
 	$blocks         = $json['SUMMARY'][0]['Found Blocks'];
 	
 	$json = get_api($ip,'pools');
 	
-	$pool_status[0]   = $json['POOLS'][0]['Status'];
-	$pool_status[1]   = $json['POOLS'][1]['Status'];
-	$pool_status[2]   = $json['POOLS'][2]['Status'];
-	$pool_prio[0]     = $json['POOLS'][0]['Priority'];
-	$pool_prio[1]     = $json['POOLS'][1]['Priority'];
-	$pool_prio[2]     = $json['POOLS'][2]['Priority'];
-	$pool_url[0]      = $json['POOLS'][0]['URL'];
-	$pool_url[1]      = $json['POOLS'][1]['URL'];
-	$pool_url[2]      = $json['POOLS'][2]['URL'];
-	$pool_user[0]     = $json['POOLS'][0]['User'];
-	$pool_user[1]   = $json['POOLS'][1]['User'];
-	$pool_user[2]     = $json['POOLS'][2]['User'];
-	$pool_diff[0]     = $json['POOLS'][0]['Diff'];
-	$pool_diff[1]     = $json['POOLS'][1]['Diff'];
-	$pool_diff[2]     = $json['POOLS'][2]['Diff'];
-	$pool_works[0]    = $json['POOLS'][0]['Getworks'];
-	$pool_works[1]    = $json['POOLS'][1]['Getworks'];
-	$pool_works[2]    = $json['POOLS'][2]['Getworks'];
-	$pool_lstime[0]   = $json['POOLS'][0]['Last Share Time'];
-	$pool_lstime[1]   = $json['POOLS'][1]['Last Share Time'];
-	$pool_lstime[2]   = $json['POOLS'][2]['Last Share Time'];
+	for ($i=0; $i<3; $i++) {
+		$pool_status[$i]   = $json['POOLS'][$i]['Status'];
+		$pool_prio[$i]     = $json['POOLS'][$i]['Priority'];
+		$pool_url[$i]      = $json['POOLS'][$i]['URL'];
+		$pool_user[$i]     = $json['POOLS'][$i]['User'];
+		$pool_diff[$i]     = $json['POOLS'][$i]['Diff'];
+		$pool_works[$i]    = $json['POOLS'][$i]['Getworks'];
+		$pool_lstime[$i]   = $json['POOLS'][$i]['Last Share Time'];
+	}
 	
 	$json = get_api($ip,'stats');
-	
+
 	$miner_type     = $json['STATS'][0]['Type'];
 	$miner_ver      = $json['STATS'][0]['Miner'];
 	$miner_compile  = $json['STATS'][0]['CompileTime'];
 	$freq           = $json['STATS'][1]['frequency'];
-
+	
 	if ($type == 's9') {
 		$bmminer_ver    = $json['STATS'][0]['BMMiner'];
 		$asic0_btemp    = $json['STATS'][1]['temp6'];
@@ -126,10 +100,10 @@ function miner_details($type,$ip) {
 		$fan1           = $json['STATS'][1]['fan5'];
 		$fan2           = $json['STATS'][1]['fan6'];
 		$fan3           = $json['STATS'][1]['fan3'];
-		$hrate_ideal    = number_format($json['STATS'][1]['total_rateideal']);
+		$hrate_ideal	= $json['STATS'][1]['total_rateideal'];
 		$asic_chip_sum = $asic0_chips+$asic1_chips+$asic2_chips;
 		if ($miner_type == '') { $miner_type = 'Braiins OS';}
-		else {          $miner_type     =  preg_replace('/S9S9/','S9',$miner_type);}
+		else {		$miner_type     =  preg_replace('/S9S9/','S9',$miner_type);}
 		if ($asic0_btemp>90) { $bcl0 = 'red';} else if ($asic0_btemp>80) { $bcl0 = 'orange';} else if ($asic0_btemp>75) { $bcl0 = 'yellow';} else if ($asic0_btemp>50) { $bcl0 = 'green';} else { $bcl0 = 'blue';}
 		if ($asic1_btemp>90) { $bcl1 = 'red';} else if ($asic1_btemp>80) { $bcl1 = 'orange';} else if ($asic1_btemp>75) { $bcl1 = 'yellow';} else if ($asic1_btemp>50) { $bcl1 = 'green';} else { $bcl1 = 'blue';}
 		if ($asic2_btemp>90) { $bcl2 = 'red';} else if ($asic2_btemp>80) { $bcl2 = 'orange';} else if ($asic2_btemp>75) { $bcl2 = 'yellow';} else if ($asic2_btemp>50) { $bcl2 = 'green';} else { $bcl2 = 'blue';}
@@ -166,14 +140,14 @@ function miner_details($type,$ip) {
 		if ($ghs5s>650) {$thcl = 'greenlight';} else if ($ghs5s>600) {$thcl = 'green';} else if ($ghs5s>500) {$thcl = 'blue';} else if ($ghs5s>450) {$thcl = 'yellow';} else if ($ghs5s>400) {$thcl = 'orange';} else {$thcl = 'red';}
 		if ($asic_chip_sum<288) {$csumcl = 'red';} else {$csumcl = '';}
 	}
-
-	if      ($elapsed<180)          {       $uptime = $elapsed . " sec";    }
-	else if ($elapsed<3600*2)       {       $uptime = floor($elapsed/60) . " min"; }
-	else if ($elapsed<3600*48)      {       $uptime = floor($elapsed/3600) . " H";  }
-	else							{       $uptime = floor($elapsed/(3600*24)) . " days";  }
 	
-	if ($hw > 100000) {     $hw = '<td class="hwred">' . number_format($hw);}
-	else                    {       $hw = "<td>" . number_format($hw);      }
+	if	 	($elapsed<180) 		{	$uptime = $elapsed . " sec";$upbox ='box red';}
+	else if ($elapsed<3600*2)	{	$uptime = floor($elapsed/60) . " min";$upbox ='box yellow'; }
+	else if ($elapsed<3600*48)	{	$uptime = floor($elapsed/3600) . " H";	$upbox =' box blue';}
+	else 						{	$uptime = floor($elapsed/(3600*24)) . " days";	}
+	
+	if ($hw > 100000) {	$hw = '<td class="hwred">' . number_format($hw);}
+	else 			{	$hw = "<td>" . number_format($hw);	}
 	if ($fan1 == 0) { $fan1 = $fan3; }
 	$rejrate = round((100*($rejected/$accepted)), 3);
 	if ($pool_prio[0] == 0 ) {$poolnum = 0;}
@@ -183,6 +157,8 @@ function miner_details($type,$ip) {
 	$pool_url[$poolnum] = preg_replace("/stratum\+tcp:\/\/(.*)/","\$1",$pool_url[$poolnum]);
 	if (preg_match('/kano.is/', $pool_url[$poolnum])) { $pool_url[$poolnum] = 'Kano'; }
 	else if (preg_match('/viabtc.com/', $pool_url[$poolnum])) { $pool_url[$poolnum] = 'ViaBTC'; }
+	else if (preg_match('/slushpool.com/', $pool_url[$poolnum])) { $pool_url[$poolnum] = 'Slush'; }
+	else if (preg_match('/sigmapool.com/', $pool_url[$poolnum])) { $pool_url[$poolnum] = 'Sigma'; }
 	$worker_parts = explode('.', $pool_user[$poolnum]);
 	$worker_name = $worker_parts[0];
 	$worker_id = $worker_parts[1];
@@ -193,25 +169,31 @@ function miner_details($type,$ip) {
 	if ($fan2>5999) { $fan2cl = 'red'; }
 	else if ($fan2>5000) { $fan2cl = 'yellow'; }
 	else if ($fan2<3500) { $fan2cl = 'blue'; }
-
+	$thdiff = $hrate_ideal - $ghsav;
+    if ($thdiff<0)  {$thavcol = 'fgreen';}
+	else if ($thdiff>600)   {$thavcol = 'fred';}
+    else if ($thdiff>300)   {$thavcol = 'forange';}
+	else if ($thdiff>150)   {$thavcol = 'fyellow';}
+	else    {$thavcol = 'fblue';}
+		
 	$html = "<tr>
-	<td>$miner_type</td>
-	<td>$miner_ver</td>
-	<td>$ip</td>
-	<td>$pool_url[$poolnum]</td>
-	<td>$worker_name</td>
-	<td>$worker_id</td>
-	<td>$pool_diff[$poolnum]</td>
-	<td>$getworks</td>
-	<td>$pool_lstime[$poolnum]</td>
-	<td>$blocks</td>
-	<td>$uptime</td>
-	<td><span class=\"box $fan1cl\">$fan1</span><span class=\"box $fan2cl\">$fan2</span></td>
-	<td>$freq</td>";
-	if ($type == 's9') { $html .= "<td>$hrate_ideal</td>"; }
-	$html .= "
+		<td>$miner_type</td>
+		<td>$miner_ver</td>
+		<td><a href=\"getinfo.php?ip=$ip\">$ip</a></td>
+		<td>$pool_url[$poolnum]</td>
+		<td>$worker_name</td>
+		<td>$worker_id</td>
+		<td>$pool_diff[$poolnum]</td>
+		<td>$getworks</td>
+		<td>$pool_lstime[$poolnum]</td>
+		<td>$blocks</td>
+		<td><span class=\"$upbox\">$uptime</span></td>
+		<td><span class=\"box $fan1cl\">$fan1</span><span class=\"box $fan2cl\">$fan2</span></td>
+		<td>$freq</td>";
+	if ($type == 's9') { $html .= "<td>".number_format($hrate_ideal)."</td>"; }
+	$html .= "		
 		<td><span class=\"box $thcl\">" . number_format($ghs5s). "</span></td>
-		<td>$ghsav</td>
+		<td class=\"ghsav $thavcol\">".number_format($ghsav)."</td>
 		$hw</td>
 		<td>$rejrate%</td>";
 	if ($type == 's9') {
@@ -221,53 +203,54 @@ function miner_details($type,$ip) {
 	}
 	else {
 		$html .= "
-		<td><span class=\"box $bcl0\"> $asic0_btemp</span><span class=\"box $bcl1\"> $asic1_btemp</span><span class=\"box $bcl2\">$asic2_btemp</span><span class=\"box $bcl3\">$asic3_btemp</span></td>
-		<td><span class=\"box $ccl0\">$ctemp0</span><span class=\"box $ccl1\">$ctemp1</span><span class=\"box $ccl2\">$ctemp2</span><span class=\"box $ccl3\">$ctemp3</span></td>";
+        <td><span class=\"box $bcl0\"> $asic0_btemp</span><span class=\"box $bcl1\"> $asic1_btemp</span><span class=\"box $bcl2\">$asic2_btemp</span><span class=\"box $bcl3\">$asic3_btemp</span></td>
+        <td><span class=\"box $ccl0\">$ctemp0</span><span class=\"box $ccl1\">$ctemp1</span><span class=\"box $ccl2\">$ctemp2</span><span class=\"box $ccl3\">$ctemp3</span></td>";
 	}
 	$html .= "<td><span class=\"box $csumcl\">$asic_chip_sum</span></td></tr>";
 
-	return array($ghs5s,$html);
+	return array($ghs5s,$ghsav,$html);
 }
 
-$html = '<link href="/main.css" type="text/css" rel="stylesheet"/>';
+$html = '<link href="/stats/main.css" type="text/css" rel="stylesheet"/><head><title>All Rigs</title></head>';
 $html .= "<body><table border=0 cellspacing=0 cellpadding=4><tr class=head><td>Type</td><td>Miner</td><td>IP</td><td>Pool</td><td>Worker</td><td>ID</td><td>Diff</td><td>Works</td><td>LS time</td><td>Block</td><td>Uptime</td><td>Fans</td><td>Freq</td><td>TH ideal</td><td>TH 5s</td><td>TH Avg</td><td>HW</td><td>Reject</td><td>Board Temp</td><td>Chip Temp</td><td>Chips</td></tr>";
 
+$totalavg = 0;
 for($x = 0; $x < $s9num; $x++) {
 	
 	$vars = miner_details('s9',$s9[$x]);
 	$totalhashrate += $vars[0];
-	$html .= $vars[1];
+	$totalavg += $vars[1];
+	$html .= $vars[2];
 }
 
-$html .= "</table><br><span class=bold>Total: ". $s9num . " miners" . " / " . number_format($totalhashrate/1000,2) . " Th</span><br><br>";
+$html .= "</table><br><span class=bold>Total: ". $s9num . " miners" . " / " . number_format($totalhashrate/1000,2) . " Th  / ".number_format($totalavg/1000,2) ." Th(Avg)</span><br><br>";
 
 $html .= "<table border=0 cellspacing=0 cellpadding=4><tr class=head><td>Type</td><td>Miner</td><td>IP</td><td>Pool</td><td>Worker</td><td>ID</td><td>Diff</td><td>Works</td><td>LS time</td><td>Block</td><td>Uptime</td><td>Fans</td><td>Freq</td><td>MH 5s</td><td>MH Avg</td><td>HW</td><td>Reject</td><td>Board Temp</td><td>Chip Temp</td><td>Chips</td></tr>";
 
+$l3hashavg =0;
 for($x = 0; $x < $l3num; $x++) {
 
-	$vars = miner_details('l3',$l3[$x]);
-	$l3hashrate += $vars[0];
-	$html .= $vars[1];
+        $vars = miner_details('l3',$l3[$x]);
+        $l3hashrate += $vars[0];
+        $l3hashavg += $vars[1];
+        $html .= $vars[2];
 }
 
-$l3hashrate = number_format($l3hashrate);
-$html .= "</table><br><span class=bold>Total: ". $l3num . " miners" . " / " . $l3hashrate . " Mh</span><br><br>";
+$html .= "</table><br><span class=bold>Total: ". $l3num . " miners" . " / " . number_format($l3hashrate) . " Mh / ".number_format($l3hashavg). " Mh(Avg)</span><br><br>";
 
-$html .= "<table border=0 cellspacing=0 cellpadding=4><tr class=head><td>Type</td><td>IP</td><td>Pool</td><td>Uptime</td><td>ETH/Dual</td><td>Temp avg</td><td>GPU0</td><td>GPU1</td><td>GPU2</td><td>GPU3</td><td>GPU4</td><td>GPU5</td><td>GPU6</td><td>GPU7</td><td>GPU8</td><td>GPU9</td></tr>";
+$html .= "<table border=0 cellspacing=0 cellpadding=4><tr class=head><td>Type</td><td>IP</td><td>Pool</td><td>Uptime</td><td>ETH/XVG</td><td>Temp avg</td><td>GPU0</td><td>GPU1</td><td>GPU2</td><td>GPU3</td><td>GPU4</td><td>GPU5</td><td>GPU6</td><td>GPU7</td><td>GPU8</td><td>GPU9</td></tr>";
 
 for($x = 0; $x < $rigsnum; $x++) {
-
-	$ip	= $rigs[$x][0];
+	
+	$ip = $rigs[$x][0];
 	$name = $rigs[$x][1];
 	$gpus = $rigs[$x][2];
-	$port = $rigs[$x][3];
 	
-	$socket = fsockopen($ip, $port, $err_code, $err_str,2);
-	if (!$socket) { continue;}
+	$socket = fsockopen($ip, 3333, $err_code, $err_str);
 	$data = '{"id":1,"jsonrpc":"2.0","method":"miner_getstat2"}' . "\r\n\r\n";
 	fputs($socket, $data);
 	$buffer = null;
-	while (!feof($socket)) { $buffer .= fgets($socket, $port); }
+	while (!feof($socket)) { $buffer .= fgets($socket, 3333); }
 	if ($socket) {  fclose($socket); }
 	
 	$json = json_decode($buffer,true);
@@ -299,7 +282,6 @@ for($x = 0; $x < $rigsnum; $x++) {
 	}
 	
 	$eth_pool = preg_replace("/(.*);.*/","\$1",$pools);
-	if (preg_match('/etcget.net/', $eth_pool)) { $eth_pool = 'Max(etc)'; }
 	$eth_all = preg_replace("/(\d+);.*/","\$1",$total_eth);
 	$xvg_all = preg_replace("/(\d+);.*/","\$1",$total_xvg);
 	$eth_all = sprintf('%0.1f', $eth_all/1000);
@@ -340,10 +322,10 @@ for($x = 0; $x < $rigsnum; $x++) {
 	$html .= $gpushtml . "</tr>";
 }
 
-$html .=  "</table><span class=bold><br>RIGs: " . $rigsnum . " ETH: " . $ethtotal . " Mh" . " / Dual: " . $xvgtotal . " Gh</span>";
+$html .=  "</table><br>RIGs: " . $rigsnum . " ETH: " . $ethtotal . " Mh" . " / XVG: " . $xvgtotal . " Gh";
 
 $exec_time = round(microtime(true) - $start, 3);
-$html .=  "<br><br>Load time: " . $exec_time . " sec (" . date('Y-m-d H:i:s') .")";
+$html .=  "Load time: " . $exec_time . " sec (" . date('Y-m-d H:i:s') .")";
 $html .=  "</body>";
 
 print $html;
