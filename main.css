@@ -1,9 +1,17 @@
+a{
+	text-decoration: none;
+	color:           #00ddc5;
+}
 body {
 	background-color: black;
 	color: white;
+	margin-top: 4px;
 }
 table {
 	font-size: 14px;
+}
+.reload {
+	cursor:pointer;
 }
 .hwred {
 	color: #ed5550;
@@ -17,10 +25,17 @@ table {
 }
 .total {font-weight: bold;}
 .red { background-color: red; font-weight: bold;}
+.fred { color: red; font-weight: bold;}
+.dred { color: red; font-weight: bold;}
+.fgreen { color: #23f223; font-weight: bold;}
+.fyellow { color: #ffff05; }
+.dgreen { color: green; font-weight: bold;}
 .greenlight { background-color: #06e910; color: #1f0cd8; font-weight: bold;}
 .green { background-color: green;}
 .yellow { background-color: #ffff05; color: #000;}
 .orange { background-color: #d85f07;}
+.forange { color: #ff6b00;}
+.fblue { color: #33f9f9;}
 .blue { background-color: #0a64c8;}
 .fiol { background-color: #8d029c;}
 .box {
@@ -31,4 +46,30 @@ table {
 	padding-bottom: 1;
 	border-radius: 4px 4px 4px 4px;
 	margin-right: 5;
+
+}
+.asics {
+	padding-left: 300px;
+}
+.btcnavbar {
+	display: inline-block;
+	margin-right: 15px;
+	
+}
+
+.btcnavbar img {
+	margin-top: -4px;
+	margin-right: -5px;
+	vertical-align: middle;
+}
+.tdprofit img {
+        margin-top: -4px;
+        vertical-align: middle;
+}
+.tickers {
+	position: relative;
+	margin-bottom: 3px;
+	left: 200px;
+	width: 800px;
+	font-family: SFMono-Regular,Menlo,Monaco,Consolas,liberation mono,courier new,monospace;
 }
