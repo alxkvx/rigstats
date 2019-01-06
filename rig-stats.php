@@ -211,7 +211,7 @@ function miner_details($type,$ip) {
 	return array($ghs5s,$ghsav,$html);
 }
 
-$html = '<link href="/main.css" type="text/css" rel="stylesheet"/><head><title>All Rigs</title></head>';
+$html = '<link href="main.css" type="text/css" rel="stylesheet"/><head><title>All Rigs</title></head>';
 $html .= "<body><table border=0 cellspacing=0 cellpadding=4><tr class=head><td>Type</td><td>Miner</td><td>IP</td><td>Pool</td><td>Worker</td><td>ID</td><td>Diff</td><td>Works</td><td>LS time</td><td>Block</td><td>Uptime</td><td>Fans</td><td>Freq</td><td>TH ideal</td><td>TH 5s</td><td>TH Avg</td><td>HW</td><td>Reject</td><td>Board Temp</td><td>Chip Temp</td><td>Chips</td></tr>";
 
 $totalavg = 0;
