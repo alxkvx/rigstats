@@ -8,7 +8,7 @@ This is simple php page that collects stats from miners and shows it on single p
 - running web server: apache/nginx etc.
 - php with json module
 
-## Installaion:
+## Installation:
 download rig-stats.php and main.css files into web server doc root (f.e. /var/www/html)
 
 Add/edit your miners IP in rig-stats.php, replace with your miners IPs:
