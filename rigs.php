@@ -17,47 +17,6 @@ for($x = 0; $x < $rigsnum; $x++) {
         $type = $rigs[$x][3];
         $gpus = $rigs[$x][4];
 
-        if ($port == 44444) {
-                $data = file_get_contents("http://$ip:44444/summary");
-                $json = json_decode($data,true);
-                #print $data;
-                $miner  = $json['Software'];
-                $coin   = $json['Mining']['Coin'];
-                $elapsed = $json['Session']['Uptime'];
-                $gpus_num = $json['Session']['Active_GPUs'];
-                $hashrate = $json['Session']['Performance_Summary'];
-                $pool     = $json['Stratum']['Current_Pool'];
-                for ($z=0;$z<$gpus;$z++){ $gpu_sol[$z] = $json['GPUs'][$z]['Performance'];}
-                if (preg_match("/sparkpool.com/", $pool)) { $pool = 'Sparkpool';}
-                if ($elapsed<3600*2)    { $uptime = floor($elapsed/60) . " min";        }
-                else if ($elapsed<3600*48){ $uptime = floor($elapsed/3600) . " H";      }
-                else                    { $uptime = floor($elapsed/(3600*24)) . " days";}
-                if ($type == 'RX570')   {$tcol = 'amd';}
-                $soltotal += $hashrate;
-
-                $html.= "<tr>
-                <td>$name</td>
-                <td><span class=\"box $tcol\">$type</span></td>
-                <td>$gpus</td>
-                <td>$miner</td>
-                <td>$coin</td>
-                <td>$ip</td>
-                <td>$pool</td>
-                <td>$uptime</td>
-                <td>$hashrate</td>
-                <td>&deg;</td>";
-
-                for ($i=0;$i<$gpus;$i++){
-                        if ($gpu_sol[$i] === NULL) {$html.= "<td align=center><span class=\"box red\">X</span>";}
-                        else {
-                                if ($gpu_sol[$i] > 11) {$ecol = 'fontgreen';} else if ($gpu_sol[$i] > 9) {$ecol = 'fontblue';} else if ($gpu_sol[$i] > 8) {$ecol = 'fontyell';} else {$ecol = 'fred';}
-                                $html .= "<td><span class=\"box $ecol\">$gpu_sol[$i]</span>Sol/s</td>";
-                        }
-                }
-
-                $html.= "</tr>";
-                continue;
-        }
         $socket = fsockopen($ip, $port, $err_code, $err_str,0.5);
         if (!$socket) {
                 $html .= "<tr><td>$name</td><td></td><td><span class=\"red\">$ip</span></td><td><span class=\"box red\">Offline</span></td></tr>";
