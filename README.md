@@ -13,12 +13,15 @@ download files into web server doc root (f.e. /var/www/html):
 ```
 root@raspberrypi:/var/www/html/# git clone https://github.com/alxkvx/rig-stats.git
 ```
-
-Add/edit your miners IP in rig-stats.php, replace with your miners IPs:
+change owner of files to Apache user:
+```
+root@raspberrypi:/var/www/html# chown -R www-data.www-data rig-stats/
+```
+Add your miners using "ADD" button on the page.
 
 ## Access:
-http://<machine_IP>/s9.php
+http://<machine_IP>/rig-stats/s9.php
 
-http://<machine_IP>/l3.php
+http://<machine_IP>/rig-stats/l3.php
 
-http://<machine_IP>/rigs.php
+http://<machine_IP>/rig-stats/rigs.php
