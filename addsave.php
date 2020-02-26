@@ -1,7 +1,7 @@
 <?php
 
-$jsfile = 'json/s9list.json';
-$l3jsfile = 'json/l3list.json';
+$jsfile = 'json/s9.json';
+$l3jsfile = 'json/l3.json';
 
 $id   = $_GET['id'];
 $type = $_GET['type'];
