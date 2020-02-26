@@ -1,10 +1,10 @@
 ## rig-stats
 This is simple php page that collects stats from miners and shows it on single page.
 
-![alt text](https://raw.githubusercontent.com/alxkvx/rig-stats/master/rigs.JPG)
-![alt text](https://raw.githubusercontent.com/alxkvx/rig-stats/master/rig_extinfo.JPG)
+![alt text](https://raw.githubusercontent.com/alxkvx/rig-stats/master/miners.JPG)
+![alt text](https://raw.githubusercontent.com/alxkvx/rig-stats/master/miners_info.JPG)
 ## Requirements:
-- Linux or windows pc/laptop/server/VM on the same network with miners
+- Linux or windows pc/laptop/raspberryPi/server/VM on the same network with miners
 - running web server: apache/nginx etc.
 - php with json module
 
