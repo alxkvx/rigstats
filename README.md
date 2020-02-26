@@ -9,28 +9,13 @@ This is simple php page that collects stats from miners and shows it on single p
 - php with json module
 
 ## Installation:
-download rig-stats.php and main.css files into web server doc root (f.e. /var/www/html)
+download files into web server doc root (f.e. /var/www/html):
+```
+root@raspberrypi:/var/www/html/# git clone https://github.com/alxkvx/rig-stats.git
+```
 
 Add/edit your miners IP in rig-stats.php, replace with your miners IPs:
-```
-$s9 = array(
-	'10.10.11.54',
-	'10.10.11.55',
-	'10.10.11.56',
-	'10.10.11.58',
-	'10.10.11.59'
-);
 
-$l3 = array(
-	'10.10.11.40',
-	'10.10.11.48'
-);
-
-$rigs = array (
-	['10.10.11.62',<rig_name>,<cards_number>,<claymore_api_port>],
-	['10.10.11.63','rig01 8xRX570',8,3335]
-);
-```
 ## Access:
 http://<machine_IP>/s9.php
 
