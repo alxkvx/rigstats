@@ -32,4 +32,6 @@ $rigs = array (
 );
 ```
 ## Access:
-http://<machine_IP>/rig-stats.php
+http://<machine_IP>/s9.php
+http://<machine_IP>/l3.php
+http://<machine_IP>/rigs.php
